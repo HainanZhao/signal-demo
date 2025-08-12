@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Demonstration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Signal Demonstration</h1>
+  <p>This is a simple demonstration of how signals are implemented and triggered. The console will show the effects being run.</p>
+
+  <div class="container">
+    <div class="section">
+      <h2>Correct Usage</h2>
+      <div id="correct-usage">
+        <p>First name: <span id="firstName"></span></p>
+        <p>Last name: <span id="lastName"></span></p>
+        <p>Full name: <span id="fullName"></span></p>
+        <button id="changeName">Change First Name</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Incorrect Usage</h2>
+      <div id="incorrect-usage">
+        <p>Count: <span id="count">0</span></p>
+        <button id="increment">Increment</button>
+        <p class="warning">Check the console to see why this is incorrect.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="signal.js"></script>
+  <script>
+    // Correct Usage Demo
+    const firstName = signal('John');
+    const lastName = signal('Doe');
+    const fullName = computed(() => `${firstName.get()} ${lastName.get()}`);
+
+    effect(() => {
+      document.getElementById('firstName').textContent = firstName.get();
+      console.log('Effect for first name:', firstName.get());
+    });
+
+    effect(() => {
+      document.getElementById('lastName').textContent = lastName.get();
+      console.log('Effect for last name:', lastName.get());
+    });
+
+    effect(() => {
+      document.getElementById('fullName').textContent = fullName.get();
+      console.log('Effect for full name:', fullName.get());
+    });
+
+    document.getElementById('changeName').addEventListener('click', () => {
+      firstName.set('Jane');
+    });
+
+    // Incorrect Usage Demo
+    let countSignal = signal(0);
+    // The mistake: Reading the signal's value outside of the effect.
+    // The `countValue` variable holds the value of the signal at the time of reading, but it is not reactive.
+    const countValue = countSignal.get();
+
+    // This effect depends on the `countValue` variable, not the `countSignal` itself.
+    // Because `.get()` is not called inside the effect's callback, no dependency is tracked.
+    effect(() => {
+      console.log('Incorrect effect for count. This will only run once.');
+      document.getElementById('count').textContent = countValue;
+    });
+
+    // When the button is clicked, the signal is updated, but the effect does not re-run.
+    // The UI will not be updated automatically.
+    document.getElementById('increment').addEventListener('click', () => {
+        countSignal.set(countSignal.get() + 1);
+        console.log('Incrementing count to:', countSignal.get());
+        console.log("But the effect didn't run again, and the UI was not updated. Check the console logs.");
+    });
+  </script>
+</body>
+</html>
