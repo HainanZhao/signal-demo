@@ -246,3 +246,16 @@ To demonstrate this, a `ChildComponent` was created with a `computed` signal tha
 4.  Now, when the source signal is updated, **nothing is logged from the child**, because the `computed` signal no longer exists to react to the change.
 
 This confirms that Angular's signals are robustly tied to the component lifecycle, preventing orphaned computations and potential memory leaks.
+
+### Experiment: `OnPush` Change Detection vs. `computed()` Evaluation
+
+To further clarify when a `computed()` signal's logic runs, the `ChildComponent` was updated to use the `OnPush` change detection strategy. A timer was added to manually call `ChangeDetectorRef.detectChanges()` every second.
+
+**The Goal:** To see if forcing a component to re-render would also force the `computed()` signal to re-evaluate.
+
+**The Result:**
+- The `console.log` from the manual `detectChanges()` call appeared every second, confirming the component's view was being checked for updates.
+- The `console.log` from inside the `computed()` signal's derivation function **did not** run every second. It *only* ran when the underlying `sourceSignal` was explicitly changed.
+
+**Conclusion:**
+This provides definitive proof that a `computed` signal's evaluation is completely independent of the component rendering lifecycle. It is **not** evaluated during change detection (manual or otherwise). It is **only** evaluated when one of its dependencies notifies it of a change. This is a key aspect of the performance benefits of signals: computations only run when they absolutely have to.
