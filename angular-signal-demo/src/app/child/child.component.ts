@@ -14,8 +14,9 @@ export class ChildComponent implements OnInit, OnDestroy {
 
   derivedSignal = computed(() => {
     // This log will only run when the source signal changes, NOT every second.
-    console.log('[ChildComponent] Computed signal is re-evaluating...');
-    return `Derived value: ${this.sharedState.sourceSignal() * 2}`;
+    const currentValue = this.sharedState.sourceSignal() * 2;
+    console.log(`[ChildComponent] Computed signal is re-evaluating...`);
+    return `Derived value: ${currentValue}`;
   });
 
   constructor(
@@ -33,7 +34,7 @@ export class ChildComponent implements OnInit, OnDestroy {
       this.timer = setInterval(() => {
         console.log('[ChildComponent] Manually calling detectChanges()...');
         this.cdRef.detectChanges();
-      }, 1000);
+      }, 10_000);
     });
   }
 
