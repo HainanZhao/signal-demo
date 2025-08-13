@@ -9,51 +9,30 @@ To start a local development server, run:
 ```bash
 ng serve
 ```
-
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Code scaffolding
+## Angular Signals
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+This project demonstrates the use of Angular Signals, a new reactive programming model in Angular.
 
-```bash
-ng generate component component-name
-```
+### Key Concepts
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+*   **Signals (signal):** A signal is a wrapper around a value that can notify interested consumers when that value changes.
+*   **Computed Signals (computed):** A computed signal derives its value from other signals. It is lazily evaluated and memoized.
+*   **Effects (effect):** An effect is an operation that runs whenever one or more signal values change.
 
-```bash
-ng generate --help
-```
+### Signals and Change Detection
 
-## Building
+One of the key features of signals is their integration with Angular's change detection mechanism.
 
-To build the project run:
+#### Computed Signals and `ChangeDetectionStrategy.OnPush`
 
-```bash
-ng build
-```
+A common misconception is that `ChangeDetectionStrategy.OnPush` will prevent re-rendering of a component if its inputs have not changed. While this is true for traditional input binding, Angular Signals introduce a new dynamic.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+When a component's template reads a signal, Angular creates a dependency between that component and the signal. This is true for both regular signals and computed signals.
 
-## Running unit tests
+When a signal's value changes, it notifies all its dependents. If a dependent is a component, Angular schedules that component for change detection, even if it is configured with `OnPush`. This means that any change to a signal that is read in a component's template will cause that component to be checked, and potentially re-rendered, regardless of its change detection strategy.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+In essence, signals provide a more granular way to trigger change detection. You can think of it as every signal change that is used in a template implicitly triggering an "onPush" event for that specific component. This allows for highly efficient updates, as only the components that are truly affected by a state change are re-evaluated.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project's `UntrackedChildComponent` demonstrates this. It uses `ChangeDetectionStrategy.OnPush`, but its view is updated whenever the computed signal it depends on changes.
