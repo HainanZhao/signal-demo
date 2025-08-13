@@ -1,4 +1,4 @@
-import { Component, computed, OnDestroy } from '@angular/core';
+import { Component, computed, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, OnInit } from '@angular/core';
 import { SharedStateService } from '../shared-state.service';
 
 @Component({
@@ -6,22 +6,42 @@ import { SharedStateService } from '../shared-state.service';
   standalone: true,
   imports: [],
   templateUrl: './child.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChildComponent implements OnDestroy {
+export class ChildComponent implements OnInit, OnDestroy {
 
-  // Create a computed signal that depends on the service's signal
+  private timer: any;
+
   derivedSignal = computed(() => {
-    // This log is the key to our investigation.
-    // It will only run when the component exists and the source signal changes.
+    // This log will only run when the source signal changes, NOT every second.
     console.log('[ChildComponent] Computed signal is re-evaluating...');
     return `Derived value: ${this.sharedState.sourceSignal() * 2}`;
   });
 
-  constructor(public sharedState: SharedStateService) {
+  constructor(
+    public sharedState: SharedStateService,
+    private cdRef: ChangeDetectorRef,
+    private zone: NgZone,
+  ) {
     console.log('ChildComponent created.');
+  }
+
+  ngOnInit(): void {
+    // Run a timer outside of Angular's zone to manually trigger change detection every second.
+    // This is to demonstrate that `detectChanges()` does NOT cause the computed signal to re-evaluate.
+    this.zone.runOutsideAngular(() => {
+      this.timer = setInterval(() => {
+        console.log('[ChildComponent] Manually calling detectChanges()...');
+        this.cdRef.detectChanges();
+      }, 1000);
+    });
   }
 
   ngOnDestroy(): void {
     console.log('ChildComponent destroyed.');
+    // Clean up the timer when the component is destroyed.
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   }
 }
