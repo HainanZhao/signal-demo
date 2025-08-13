@@ -25,7 +25,22 @@ A `signal` is like a smart box that holds a value. What makes it "smart" is that
 
 An `effect` is a function that runs automatically whenever the signals it depends on change. It's perfect for doing things like updating the user interface, sending network requests, or logging information.
 
+**Programming analogy**: Think of an effect like a **setup callback function** that you register to listen for changes. Just like how you might set up an event listener (`button.addEventListener('click', callback)`), an effect is a callback that gets triggered whenever its dependencies change.
+
 **Real-world analogy**: Think of an effect like a security guard who monitors multiple alarm systems (signals). Whenever any alarm goes off (signal value changes), the security guard automatically responds (the effect function runs).
+
+**Comparison to familiar patterns**:
+```javascript
+// Traditional event listener (manual setup)
+button.addEventListener('click', () => {
+    console.log('Button clicked!');
+});
+
+// Effect (automatic setup based on dependencies)
+effect(() => {
+    console.log('Counter value:', counter.get()); // Automatically runs when counter changes
+});
+```
 
 **Example use cases**:
 - Updating a text element in HTML when a username changes
