@@ -134,3 +134,101 @@ You don't have to manually update each calculation or remember to update the dis
 **Declarative Programming**: Instead of writing step-by-step instructions (imperative), you declare relationships between data (declarative). The system figures out the execution order.
 
 **Reactive Programming**: This is a programming paradigm oriented around data flows and the propagation of change - perfect for user interfaces and real-time applications.
+
+---
+
+## Angular Signal Implementation & Findings
+
+The vanilla JavaScript example was migrated to a modern Angular application to demonstrate how the same concepts apply within a major framework and to investigate some of its specific behaviors. Due to issues with the development environment, the Angular CLI could not be used, so the component files were created manually.
+
+The core logic was replicated in a `SignalDemoComponent`. Here is the component's TypeScript code:
+
+**`signal-demo.component.ts`**
+```typescript
+import { Component, signal, computed } from '@angular/core';
+
+@Component({
+  selector: 'app-signal-demo',
+  standalone: true,
+  imports: [],
+  templateUrl: './signal-demo.component.html',
+  styleUrl: './signal-demo.component.css'
+})
+export class SignalDemoComponent {
+  // Correct Usage Demo
+  firstName = signal('John');
+  lastName = signal('Doe');
+  fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
+
+  changeName() {
+    this.firstName.set('Jane');
+  }
+
+  // Incorrect Usage Demo
+  countSignal = signal(0);
+  // The mistake: Reading the signal's value outside of a reactive context.
+  // This `countValue` is a static snapshot, not a reactive binding.
+  countValue = this.countSignal();
+
+  increment() {
+    this.countSignal.set(this.countSignal() + 1);
+    console.log('Incrementing count to:', this.countSignal());
+    console.log("But the 'Incorrect Usage' UI will not update. Check the console logs.");
+  }
+}
+```
+
+And the corresponding template:
+
+**`signal-demo.component.html`**
+```html
+<h1>Signal Demonstration (Angular)</h1>
+<p>This is a simple demonstration of how signals are implemented and triggered in Angular. The console will show the effects being run.</p>
+
+<div class="container">
+  <div class="section">
+    <h2>Correct Usage</h2>
+    <div id="correct-usage">
+      <p>First name: <span>{{ firstName() }}</span></p>
+      <p>Last name: <span>{{ lastName() }}</span></p>
+      <p>Full name: <span>{{ fullName() }}</span></p>
+      <button (click)="changeName()">Change First Name</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Incorrect Usage</h2>
+    <div id="incorrect-usage">
+      <!-- This binds to the static `countValue` property, not the signal itself. -->
+      <p>Count: <span>{{ countValue }}</span></p>
+      <button (click)="increment()">Increment</button>
+      <p class="warning">
+        The count in the UI will not update because we are displaying a static variable (`countValue`)
+        that was read from the signal only once during component initialization.
+        The `countSignal` itself is updating, but the template isn't subscribed to it.
+        Check the console to see the signal's real value.
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+### Investigation Findings
+
+Based on a review of the official Angular documentation, here are the answers to the initial questions.
+
+#### 1. When are effects/computed signals evaluated?
+
+The evaluation strategy depends on whether you are using a `computed` signal or an `effect`.
+
+*   **Computed Signals (`computed`)**: They are **lazily evaluated**. This means the derivation function (the code inside `computed(...)`) does *not* run immediately when a dependency changes. Instead, it only runs when the computed signal's value is read for the first time after a dependency has been updated. The result is then cached (memoized) and returned on subsequent reads until another dependency changes, which invalidates the cache.
+
+*   **Effects (`effect`)**: They run **asynchronously**. When a signal that an effect depends on is updated, the effect is not executed immediately. It is scheduled to run as part of Angular's change detection cycle. This allows the framework to batch multiple signal changes into a single effect execution, improving performance and preventing redundant runs.
+
+#### 2. How does Angular manage signal "subscriptions" when a component is destroyed?
+
+Angular handles this **automatically** through its dependency injection and component lifecycle management.
+
+*   When an `effect` is created within a component (e.g., in its `constructor`), Angular ties the effect's lifetime to that component's lifetime.
+*   When the component is destroyed (for example, because an `*ngIf` becomes `false`), Angular automatically destroys the effect as well.
+*   This automatic cleanup mechanism prevents memory leaks. You do not need to manually "unsubscribe" from signals in the way you would with RxJS Subscriptions in `ngOnDestroy`. The framework manages the lifecycle of the reactive dependency graph for you.
