@@ -38,8 +38,8 @@ export class SignalDemoComponent {
     this.showChild.update(v => !v);
   }
 
-  updateSourceSignal() {
-    this.sharedState.sourceSignal.update(v => v + 1);
+  resetSourceSignal() {
+    this.sharedState.sourceSignal.set(0);
     console.log('--- Source signal updated. --- ', this.sharedState.sourceSignal());
   }
 }
