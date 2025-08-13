@@ -40,8 +40,6 @@ export class SignalDemoComponent {
 
   updateSourceSignal() {
     this.sharedState.sourceSignal.update(v => v + 1);
-    console.log('--- Source signal updated. ---');
-    console.log('If child exists, its computed signal will log to the console.');
-    console.log("If child doesn't exist, nothing will be logged from it.");
+    console.log(`--- Source signal updated. ${this.sharedState.sourceSignal()} --- `);
   }
 }
