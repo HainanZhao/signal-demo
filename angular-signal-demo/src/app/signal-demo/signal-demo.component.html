@@ -27,3 +27,20 @@
     </div>
   </div>
 </div>
+
+<hr>
+
+<div class="section">
+  <h2>Demo: Computed Signal Lifecycle</h2>
+  <p>This demonstrates that a `computed()` signal's logic stops executing once its host component is destroyed.</p>
+  <div class="controls">
+    <button (click)="toggleChildComponent()">
+      {{ showChild() ? 'Destroy' : 'Create' }} Child Component
+    </button>
+    <button (click)="updateSourceSignal()">
+      Update Source Signal
+    </button>
+  </div>
+
+  <app-child *ngIf="showChild()"></app-child>
+</div>

@@ -1,14 +1,17 @@
 import { Component, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChildComponent } from '../child/child.component';
+import { SharedStateService } from '../shared-state.service';
 
 @Component({
   selector: 'app-signal-demo',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ChildComponent],
   templateUrl: './signal-demo.component.html',
   styleUrl: './signal-demo.component.css'
 })
 export class SignalDemoComponent {
-  // Correct Usage Demo
+  // --- Demo 1: Correct and Incorrect Usage ---
   firstName = signal('John');
   lastName = signal('Doe');
   fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
@@ -17,15 +20,28 @@ export class SignalDemoComponent {
     this.firstName.set('Jane');
   }
 
-  // Incorrect Usage Demo
   countSignal = signal(0);
-  // The mistake: Reading the signal's value outside of a reactive context (like a template or computed/effect).
-  // This `countValue` is a static snapshot, not a reactive binding.
   countValue = this.countSignal();
 
   increment() {
     this.countSignal.set(this.countSignal() + 1);
     console.log('Incrementing count to:', this.countSignal());
-    console.log("But the 'Incorrect Usage' UI will not update. Check the console logs.");
+    console.log("But the 'Incorrect Usage' UI will not update.");
+  }
+
+  // --- Demo 2: Component Destruction and Computed Signal Lifecycle ---
+  showChild = signal(false);
+
+  constructor(public sharedState: SharedStateService) {}
+
+  toggleChildComponent() {
+    this.showChild.update(v => !v);
+  }
+
+  updateSourceSignal() {
+    this.sharedState.sourceSignal.update(v => v + 1);
+    console.log('--- Source signal updated. ---');
+    console.log('If child exists, its computed signal will log to the console.');
+    console.log("If child doesn't exist, nothing will be logged from it.");
   }
 }

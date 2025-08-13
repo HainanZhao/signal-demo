@@ -232,3 +232,17 @@ Angular handles this **automatically** through its dependency injection and comp
 *   When an `effect` is created within a component (e.g., in its `constructor`), Angular ties the effect's lifetime to that component's lifetime.
 *   When the component is destroyed (for example, because an `*ngIf` becomes `false`), Angular automatically destroys the effect as well.
 *   This automatic cleanup mechanism prevents memory leaks. You do not need to manually "unsubscribe" from signals in the way you would with RxJS Subscriptions in `ngOnDestroy`. The framework manages the lifecycle of the reactive dependency graph for you.
+
+#### Follow-up: What about `computed` signals?
+
+The same automatic cleanup applies to `computed` signals. A computed signal is aware of the context where it was created. If it's created in a component, its lifecycle is bound to that component.
+
+To demonstrate this, a `ChildComponent` was created with a `computed` signal that logs to the console whenever it re-evaluates. A parent component can create or destroy this `ChildComponent`.
+
+**The behavior is as follows:**
+1.  When the `ChildComponent` is created, the `computed` signal is also created.
+2.  When the source signal (in a shared service) is updated while the `ChildComponent` exists, the `console.log` inside the `computed` function runs, and the UI updates.
+3.  When the `ChildComponent` is destroyed (via `*ngIf="false"`), the `computed` signal is also destroyed.
+4.  Now, when the source signal is updated, **nothing is logged from the child**, because the `computed` signal no longer exists to react to the change.
+
+This confirms that Angular's signals are robustly tied to the component lifecycle, preventing orphaned computations and potential memory leaks.
