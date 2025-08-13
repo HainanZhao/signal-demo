@@ -1,13 +1,22 @@
 <h1>Signal Demonstration (Angular)</h1>
-<p>This is a simple demonstration of how signals are implemented and triggered in Angular. The console will show the effects being run.</p>
+<p>
+  This is a simple demonstration of how signals are implemented and triggered in
+  Angular. The console will show the effects being run.
+</p>
 
 <div class="container">
   <div class="section">
     <h2>Correct Usage</h2>
     <div id="correct-usage">
-      <p>First name: <span>{{ firstName() }}</span></p>
-      <p>Last name: <span>{{ lastName() }}</span></p>
-      <p>Full name: <span>{{ fullName() }}</span></p>
+      <p>
+        First name: <span>{{ firstName() }}</span>
+      </p>
+      <p>
+        Last name: <span>{{ lastName() }}</span>
+      </p>
+      <p>
+        Full name: <span>{{ fullName() }}</span>
+      </p>
       <button (click)="changeName()">Change First Name</button>
     </div>
   </div>
@@ -16,31 +25,36 @@
     <h2>Incorrect Usage</h2>
     <div id="incorrect-usage">
       <!-- This binds to the static `countValue` property, not the signal itself. -->
-      <p>Count: <span>{{ countValue }}</span></p>
+      <p>
+        Count: <span>{{ countValue }}</span>
+      </p>
       <button (click)="increment()">Increment</button>
       <p class="warning">
-        The count in the UI will not update because we are displaying a static variable (`countValue`)
-        that was read from the signal only once during component initialization.
-        The `countSignal` itself is updating, but the template isn't subscribed to it.
-        Check the console to see the signal's real value.
+        The count in the UI will not update because we are displaying a static
+        variable (`countValue`) that was read from the signal only once during
+        component initialization. The `countSignal` itself is updating, but the
+        template isn't subscribed to it. Check the console to see the signal's
+        real value.
       </p>
     </div>
   </div>
 </div>
 
-<hr>
+<hr />
 
 <div class="section">
   <h2>Demo: Computed Signal Lifecycle</h2>
-  <p>This demonstrates that a `computed()` signal's logic stops executing once its host component is destroyed.</p>
+  <p>
+    This demonstrates that a `computed()` signal's logic stops executing once
+    its host component is destroyed.
+  </p>
   <div class="controls">
     <button (click)="toggleChildComponent()">
-      {{ showChild() ? 'Destroy' : 'Create' }} Child Component
+      {{ showChild() ? "Destroy" : "Create" }} Child Component
     </button>
-    <button (click)="resetSourceSignal()">
-      Reset Source Signal
-    </button>
+    <button (click)="resetSourceSignal()">Reset Source Signal</button>
   </div>
 
   <app-child *ngIf="showChild()"></app-child>
+  <app-untracked-child *ngIf="showChild()"></app-untracked-child>
 </div>

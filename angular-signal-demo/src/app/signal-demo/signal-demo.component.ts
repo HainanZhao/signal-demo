@@ -2,11 +2,12 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChildComponent } from '../child/child.component';
 import { SharedStateService } from '../shared-state.service';
+import { UntrackedChildComponent } from '../child-untracked/child.component';
 
 @Component({
   selector: 'app-signal-demo',
   standalone: true,
-  imports: [CommonModule, ChildComponent],
+  imports: [CommonModule, ChildComponent, UntrackedChildComponent],
   templateUrl: './signal-demo.component.html',
   styleUrl: './signal-demo.component.css'
 })

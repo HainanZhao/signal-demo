@@ -11,13 +11,13 @@ import {
 import { SharedStateService } from '../shared-state.service';
 
 @Component({
-  selector: 'app-child',
+  selector: 'app-untracked-child',
   standalone: true,
   imports: [],
   templateUrl: './child.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChildComponent implements OnInit, OnDestroy {
+export class UntrackedChildComponent implements OnInit, OnDestroy {
   private timer: any;
 
   derivedSignal = computed(() => {
@@ -33,6 +33,10 @@ export class ChildComponent implements OnInit, OnDestroy {
     private zone: NgZone
   ) {
     console.log('ChildComponent created.');
+  }
+
+  getValue() {
+    return untracked(this.derivedSignal);
   }
 
   ngOnInit(): void {
