@@ -125,7 +125,7 @@ quantity.set(3); // User changes quantity to 3
 
 You don't have to manually update each calculation or remember to update the display - it all happens automatically!
 
-## Key Concepts for Computer Science Students
+## Key Concepts
 
 **Dependency Tracking**: The system automatically figures out what depends on what. When `quantity` changes, it knows to update `subtotal`, which triggers updates to `tax` and `total`.
 
