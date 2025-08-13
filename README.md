@@ -25,7 +25,7 @@ A `computed` value is a signal whose value is derived from one or more other sig
 
 ```mermaid
 graph TD
-    A[signal(value)] --> B{get()}
+    A[signal(value)] --> B{get}
     B --> C[effect(fn)];
     B --> D[computed(fn)];
     C --> E[Side Effect (e.g., DOM Update)];
